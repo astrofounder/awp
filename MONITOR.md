@@ -1,177 +1,245 @@
-# AWP/Mineworks Discord Status Monitor
+# 📖 Penjelasan Output Discord Monitor
 
-Monitor status API AWP & Mineworks, kirim alert ke Discord channel dengan rich embed + deep health check.
+File ini menjelaskan **arti setiap baris** yang muncul di embed Discord.
+Dibaca oleh member yang melihat output monitor dan bertanya "ini maksudnya apa?"
 
-## Fitur
+---
 
-- 🔍 **Deep Health Check** — Cek database, Redis, keeper, gas balance per-chain
-- 📊 **Protocol Stats** — Users, epoch, staking, subnets real-time
-- ⛏️ **Mining Pool Stats** — Online miners, top reward, average score
-- 🔴 **DOWN Alert** — Kirim embed merah saat API mati
-- ✏️ **Edit-in-Place** — Selama masih down, edit pesan yang sama (update timestamp & durasi)
-- 🟢 **Recovery Alert** — Kirim pesan BARU + role ping saat API kembali online
-- 🟡 **Partial Alert** — Deteksi degradasi (keeper down, low gas) meski HTTP masih 200
-- 💾 **Crash Recovery** — State disimpan ke file, auto-resume setelah restart
-- 🕐 **WIB Timezone** — Semua waktu dalam format WIB (UTC+7)
+## Contoh Output Lengkap
 
-## Setup
-
-### 1. Buat Discord Bot
-
-1. Buka [Discord Developer Portal](https://discord.com/developers/applications)
-2. Klik **New Application** → beri nama → **Create**
-3. Klik tab **Bot** → **Reset Token** → Copy token
-4. Aktifkan **MESSAGE CONTENT INTENT** (di bagian Privileged Gateway Intents)
-5. Klik tab **OAuth2** → **URL Generator**:
-   - Scopes: `bot`
-   - Bot Permissions: `Send Messages`, `Embed Links`, `Read Message History`
-6. Copy URL → buka di browser → pilih server → Authorize
-
-### 2. Konfigurasi
-
-```bash
-copy .env.example .env
 ```
+🌐 Server
+├─ AWP API ✅ 312ms
+└─ Mineworks API ✅ 189ms
 
-Edit `.env`:
-```
-DISCORD_BOT_TOKEN=MTQ5NzgzMDYwNDA1NjU1OTcw...
-DISCORD_CHANNEL_ID=1497830604056559707
-CHECK_INTERVAL=120
-```
+⛏️ Mining Hari Ini
+├─ 📅 Epoch  : 2026-04-28 (🟢 OPEN)
+│  └ Kemarin: 3.6M sub → 44,089 rewarded
+├─ 📊 Live   : 15,230 sub | 4,100 eval
+├─ 👷 Miner  : 13,352 online
+├─ 🏅 Top    : 142,000 aMINE (miner terbaik)
+└─ 📈 Avg Score: 78/100
 
-### 3. Install & Jalankan
+📦 Dataset Ranking (total submissions)
+├─ 🥇 Wikipedia              4.6M ×1
+├─ 🥈 arXiv                  3.4M ×1
+├─ 🥉 LinkedIn Profiles      397K ×12
+├─    Amazon Reviews          47K ×8
+├─    Basic Amazon Products    33K ×8
+└─    LinkedIn Jobs            4K ×5
+  ↳ ×N = reward multiplier (makin besar = cuan)
 
-```bash
-pip install websocket-client
-python monitor.py
-```
-
-## Output Discord
-
-### All Systems Online (Hijau)
-```
-🟢 AWP STATUS: ALL SYSTEMS OPERATIONAL
-
-🌐 API Health
-├─ 📡 AWP API       → ✅ 189ms (backend utama)
-├─ 📡 Mineworks API → ✅ 342ms (server mining)
-├─ 🗄️ Database      → ✅ OK    (penyimpanan data)
-└─ 📡 Redis         → ✅ OK    (cache/antrian)
-
-⛓️ Blockchain (kondisi tiap chain)
-├─ ETH  Blok #25.0M  Keeper ✅ OK Gas:0.28 ETH
-├─ BSC  Blok #95.0M  Keeper ✅ OK Gas:12.2 BNB
-├─ Base Blok #45.3M  Keeper ✅ OK Gas:0.067 ETH
-└─ ARB  Blok #456.9M Keeper ✅ OK Gas:0.001 ETH
-  ↳ Keeper = pengirim TX on-chain
-  ↳ Gas = saldo biaya transaksi
-
-📊 AWP Network
-├─ 👥 Total User  : 198,452
-├─ 📦 Epoch       : 21 (periode reward)
-├─ 💰 Total Stake : 38.8M AWP (dikunci)
-└─ 🏗️ Subnet      : 8 aktif (area kerja miner)
-
-⛏️ Mining Pool
-├─ 🟢 Miner Online : 487 / 520
-├─ 🏆 Top Reward   : 110,177 AWP
-└─ 📊 Skor Rata²   : 80 (kualitas mining)
-
-⏱️ Monitor
-├─ 🚀 Mulai  : 29 Apr 2026 • 10:00 WIB
-├─ 🔄 Cek    : 29 Apr 2026 • 10:16 WIB
-└─ 📈 Uptime : 16 menit (8x check)
-```
-📖 [Penjelasan tiap field](https://github.com/astrofounder/awp/blob/main/discord-alert/MONITOR.md)
-
-### Partial Degradation (Kuning)
-```
-🟡 AWP STATUS: PARTIAL DEGRADATION
+💰 Info Reward & Kualifikasi
+├─ 💎 Reward Split: 41% miner | 41% validator | 18% owner
+├─ ⏰ Settlement  : 00:00 UTC (harian)
+├─ 📋 Min. Syarat: ≥80 tasks + avg score ≥60
+├─ ⚠️ LLM Enrich : WAJIB! Tanpa = max score ~55
+└─ 🎯 Credit Tier: novice→100% PoW | good→5% | excel→1%
 
 ⚠️ Masalah Terdeteksi
-├─ 💰 ETH gas hampir habis (0.000284 ETH)
-└─ 💰 ARB gas hampir habis (0.00000152 ETH)
+├─ 📡 AWP API: DOWN — Connection refused
+└─ ⛓️ Base: keeper cache mati
 ```
-
-### Full Offline (Merah)
-```
-🔴 AWP STATUS: OFFLINE
-
-⚠️ Masalah Terdeteksi
-├─ 📡 AWP API DOWN — Connection refused
-└─ 📡 Mineworks API DOWN — timeout
-```
-
-> **Note:** Di Discord, baris `📖 Penjelasan tiap field` adalah link clickable yang mengarah ke [MONITOR.md](MONITOR.md).
 
 ---
 
-## Arsitektur
+## 🌐 Server — Penjelasan Per Baris
 
 ```
-┌──────────────────┐     ┌─────────────────┐
-│   monitor.py     │────▶│  Discord API     │
-│   (main loop)    │     │  (embed + ping)  │
-├──────────────────┤     └─────────────────┘
-│   probes.py      │
-│   (deep health)  │
-├──────────────────┤     ┌─────────────────┐
-│  GatewayPresence │────▶│  Discord Gateway │
-│  (WebSocket)     │     │  (🟢 online)     │
-└──────────────────┘     └─────────────────┘
-         │
-         ▼
-  Data Sources:
-  1. GET  api.awp.sh              (HTTP ping)
-  2. POST api.awp.sh/v2           (JSON-RPC)
-  3. GET  api.awp.sh/api/health   (REST)
-  4. GET  api.minework.net        (HTTP ping)
-  5. GET  minework.net/api/miners (REST)
+├─ AWP API ✅ 312ms
 ```
+- **AWP API** = server backend utama (`awp.pro`). Mengurus registrasi, staking, reward.
+- **✅** = server merespons HTTP 200. **❌** = mati / tidak bisa dihubungi.
+- **312ms** = waktu respons. Di bawah 500ms = bagus. Di atas 2000ms = lambat.
 
-### File Structure
+```
+└─ Mineworks API ✅ 189ms
+```
+- **Mineworks API** = server mining (`api.minework.net`). Tempat miner kirim heartbeat, submit data, claim task.
+- Kalau ini mati, **miner kamu tetap jalan tapi tidak bisa submit** → 0 reward.
 
-| File | Deskripsi |
-|------|-----------|
-| `monitor.py` | Main script — loop monitoring, Discord API, Gateway, state management |
-| `probes.py` | Deep health probes, formatting helpers, issue detection, embed section builders |
-| `MONITOR.md` | Panduan user — arti setiap field di output Discord |
-| `.env` | Konfigurasi (token, channel ID, URLs) |
-| `.monitor_state.json` | Auto-generated state file untuk crash recovery |
+**Kapan muncul tambahan:**
+```
+├─ 🗃️ DB: ❌ DOWN
+├─ 📡 Redis: ❌ DOWN
+```
+- Baris DB/Redis **hanya muncul saat error**. Kalau sehat, tidak ditampilkan.
 
 ---
 
-## Environment Variables
+## ⛏️ Mining Hari Ini — Penjelasan Per Baris
 
-| Variable | Default | Deskripsi |
-|----------|---------|-----------|
-| `DISCORD_BOT_TOKEN` | — | Bot token dari Discord Developer Portal |
-| `DISCORD_CHANNEL_ID` | `1497830604056559707` | Channel target untuk embed status |
-| `ALERT_ROLE_ID` | `1211196221830471712` | Role yang di-ping saat recovery |
-| `CHECK_INTERVAL` | `120` | Interval check dalam detik |
-| `AWP_RPC_URL` | `https://api.awp.sh/v2` | JSON-RPC endpoint |
-| `AWP_HEALTH_URL` | `https://api.awp.sh/api/health` | Epoch & version info |
-| `MINEWORKS_MINERS_URL` | `https://minework.net/api/miners` | Miner stats |
-| `DOCS_URL` | GitHub MONITOR.md | Link docs di embed |
+```
+├─ 📅 Epoch  : 2026-04-28 (🟢 OPEN)
+```
+- **Epoch** = satu siklus mining 24 jam (00:00 UTC → 00:00 UTC).
+- **🟢 OPEN** = epoch sedang berjalan, kamu bisa kirim submission.
+- **✅ COMPLETED** = epoch selesai, reward sudah dihitung.
+- **🔄 SETTLING** = sedang menghitung siapa yang dapat reward.
+
+```
+│  └ Kemarin: 3.6M sub → 44,089 rewarded
+```
+- Ringkasan epoch kemarin. **3.6M sub** = 3.6 juta submission total.
+- **44,089 rewarded** = 44 ribu miner yang lolos kualifikasi dan dapat aMINE.
+
+```
+├─ 📤 Submit : 1,234,567 (890,000 valid)
+```
+- Hanya muncul kalau epoch sudah punya data.
+- **1,234,567** = total submission masuk. **890,000 valid** = yang lolos evaluasi.
+
+```
+├─ 🏆 Reward : 44,089 miner dapat reward
+```
+- Jumlah miner unik yang qualified di epoch ini.
+
+```
+├─ 📊 Live   : 15,230 sub | 4,100 eval
+```
+- Data real-time dari dashboard. **sub** = submission berjalan. **eval** = evaluasi berjalan.
+- Hanya muncul kalau nilainya > 0.
+
+```
+├─ 👷 Miner  : 13,352 online
+```
+- Jumlah miner yang heartbeat-nya masih aktif (online < 120 detik terakhir).
+- Turun drastis = ada masalah server, maintenance, atau ban massal.
+
+```
+├─ 🏅 Top    : 142,000 aMINE (miner terbaik)
+```
+- Total aMINE dari miner paling produktif. Ini benchmark — targetmu.
+
+```
+└─ 📈 Avg Score: 78/100
+```
+- Rata-rata credit score semua miner. Score ini menentukan PoW probability dan submit limit.
+- Di bawah 60 = tier "normal" atau lebih rendah. Di atas 80 = "excellent".
 
 ---
 
-## Deployment (VPS + tmux)
+## 📦 Dataset Ranking — Penjelasan Per Baris
 
-```bash
-pip install websocket-client --break-system-packages
-tmux new -s monitor
-cd /path/to/discord-alert
-python3 monitor.py
-# Detach: Ctrl+B, D | Reattach: tmux attach -t monitor
 ```
+├─ 🥇 Wikipedia              4.6M ×1
+```
+- **Wikipedia** = nama dataset yang bisa di-mine.
+- **4.6M** = total submission kumulatif ke dataset ini (bukan hari ini, tapi sepanjang waktu).
+- **×1** = reward multiplier (emission weight). **Semakin besar angka = semakin banyak aMINE per task.**
 
-### Troubleshooting
+```
+├─ 🥉 LinkedIn Profiles      397K ×12
+```
+- LinkedIn Profiles punya **×12** multiplier — artinya 1 task LinkedIn = 12× reward dibanding 1 task Wikipedia.
+- Tapi butuh LinkedIn auth/cookies untuk mining dataset ini.
 
-| Masalah | Solusi |
-|---------|--------|
-| Bot offline di Discord | Pastikan `websocket-client` terinstall |
-| Embed tidak muncul | Cek `DISCORD_BOT_TOKEN` dan `DISCORD_CHANNEL_ID` di `.env` |
-| Deep health kosong | API mungkin down, monitor tetap jalan dengan basic probe |
-| State rusak | Hapus `.monitor_state.json` dan restart |
+```
+  ↳ ×N = reward multiplier (makin besar = cuan)
+```
+- Penjelasan singkat untuk member baru.
+
+### Tabel Multiplier Lengkap
+
+| Dataset | ×Weight | Butuh Apa? |
+|---------|:-------:|------------|
+| LinkedIn Profiles | ×12 | LinkedIn login |
+| Amazon Products | ×8 | Playwright + proxy residential |
+| Amazon Reviews | ×8 | Playwright + proxy residential |
+| Basic Amazon Products | ×8 | Playwright + proxy residential |
+| LinkedIn Jobs | ×5 | LinkedIn login |
+| LinkedIn Company | ×5 | LinkedIn login |
+| LinkedIn Posts | ×5 | LinkedIn login |
+| Wikipedia | ×1 | Tidak butuh apa-apa |
+| arXiv | ×1 | Tidak butuh apa-apa |
+
+---
+
+## 💰 Info Reward & Kualifikasi — Penjelasan Per Baris
+
+```
+├─ 💎 Reward Split: 41% miner | 41% validator | 18% owner
+```
+- Dari total emisi per epoch: **41%** dibagi ke semua miner, **41%** ke validator, **18%** ke subnet owner.
+- Source: protocol-configs dari api-server-spec.
+
+```
+├─ ⏰ Settlement  : 00:00 UTC (harian)
+```
+- Reward dihitung dan dibagikan **setiap 00:00 UTC** (07:00 WIB).
+
+```
+├─ 📋 Min. Syarat: ≥80 tasks + avg score ≥60
+```
+- Untuk dapat reward di satu epoch, kamu **HARUS**:
+  - Submit **minimal 80 tasks** (bukan 10!)
+  - Punya **rata-rata score ≥60** dari evaluasi validator
+- Kurang salah satu = **0 reward** untuk epoch itu.
+
+```
+├─ ⚠️ LLM Enrich : WAJIB! Tanpa = max score ~55
+```
+- **LLM Enrichment** = proses pengayaan data pakai AI (via CLIProxyAPI).
+- **Tanpa enrichment**, skor maksimal yang bisa kamu dapat hanya ~55 dari 100.
+- Karena minimum syarat adalah score ≥60, artinya **tanpa enrichment = TIDAK MUNGKIN dapat reward**.
+
+```
+└─ 🎯 Credit Tier: novice→100% PoW | good→5% | excel→1%
+```
+- **Credit Tier** menentukan seberapa sering kamu kena PoW (Proof of Work) challenge.
+- **Novice** (score 0-19): setiap submit 100% pasti kena PoW.
+- **Good** (60-79): hanya 5% chance kena PoW.
+- **Excellent** (80-100): 1% chance — hampir tidak pernah kena.
+
+---
+
+## ⚠️ Masalah Terdeteksi — Penjelasan Per Baris
+
+Section ini **hanya muncul kalau ada masalah**. Kalau semua sehat, tidak ditampilkan.
+
+```
+├─ 📡 AWP API: DOWN — Connection refused
+```
+- Server AWP tidak bisa dihubungi. Mining bisa jalan tapi tidak bisa kirim proof/submit.
+
+```
+├─ 🗃️ Database: DOWN
+```
+- Database server mati. Semua operasi gagal.
+
+```
+├─ ⛓️ Base: keeper cache mati
+```
+- Keeper di chain Base berhenti. Ini yang kirim transaksi on-chain. Settlement reward tertunda.
+
+```
+├─ 💰 Base ETH gas kritis (0.001 ETH)
+```
+- Saldo gas relayer hampir habis. Tidak bisa kirim transaksi on-chain untuk settle reward.
+
+---
+
+## 🎨 Warna Embed
+
+| Warna | Judul Embed | Artinya |
+|:-----:|-------------|---------|
+| 🟢 Hijau | ALL SYSTEMS OPERATIONAL | Semua sehat. Aman mining. |
+| 🟡 Kuning | ⚠️ PARTIAL DEGRADATION | Ada masalah ringan (keeper/gas/1 API). Mining mungkin lambat. |
+| 🔴 Merah | 🔴 OFFLINE | Semua API mati. **Hentikan mining sementara.** |
+| 🟢 Hijau | ✅ RECOVERED | Baru pulih dari outage. Bisa mulai mining lagi. |
+
+---
+
+## ⏱️ Footer
+
+```
+Mulai: 29 Apr 06:00 | Cek: 29 Apr 13:10 | Uptime: 7h 10m
+```
+- **Mulai** = kapan monitor pertama kali dijalankan.
+- **Cek** = waktu pengecekan terakhir (di-refresh setiap beberapa menit).
+- **Uptime** = berapa lama monitor sudah aktif tanpa restart.
+
+---
+
+*AWP/Mineworks Discord Status Monitor v3.0.1*
+*Penjelasan lengkap: https://github.com/astrofounder/awp/blob/main/discord-alert/MONITOR.md*
